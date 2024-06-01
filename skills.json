@@ -1,0 +1,67 @@
+[
+    {
+        "name": "ReactJS",
+        "icon": "https://img.icons8.com/external-tal-revivo-color-tal-revivo/48/000000/external-react-a-javascript-library-for-building-user-interfaces-logo-color-tal-revivo.png"
+    },
+    {
+        "name": "TailwindCSS",
+        "icon": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Tailwind_CSS_Logo.svg/48px-Tailwind_CSS_Logo.png"
+    },
+    {
+        "name": "Bootstrap",
+        "icon": "https://img.icons8.com/color/48/000000/bootstrap.png"
+    },
+    {
+        "name": "Sass",
+        "icon": "https://img.icons8.com/color/48/000000/sass.png"
+    },
+    {
+        "name": "HTML5",
+        "icon": "https://img.icons8.com/color/48/000000/html-5--v1.png"
+    },
+    {
+        "name": "CSS3",
+        "icon": "https://img.icons8.com/color/48/000000/css3.png"
+    },
+    {
+        "name": "JavaScript",
+        "icon": "https://img.icons8.com/color/48/000000/javascript--v1.png"
+    },
+    {
+        "name": "Netlify",
+        "icon": "https://img.icons8.com/external-tal-revivo-shadow-tal-revivo/48/000000/external-netlify-a-cloud-computing-company-that-offers-hosting-and-serverless-backend-services-for-static-websites-logo-shadow-tal-revivo.png"
+    },
+    {
+        "name": "jQuery",
+        "icon": "https://img.icons8.com/ios-filled/48/1169ae/jquery.png"
+    },
+    {
+        "name": "GitHub",
+        "icon": "https://img.icons8.com/glyph-neue/48/ffffff/github.png"
+    },
+    {
+        "name": "vue",
+        "icon": "https://img.icons8.com/?size=48&id=rY6agKizO9eb&format=png"
+    },
+    {
+        "name": "Type script",
+        "icon": "https://img.icons8.com/?size=48&id=uJM6fQYqDaZK&format=png"
+    },
+    {
+        "name": "Next js",
+        "icon": "https://img.icons8.com/?size=48&id=MWiBjkuHeMVq&format=png"
+    },
+    {
+        "name": "Pug",
+        "icon": "https://img.icons8.com/?size=48&id=61393&format=png"
+    },
+    {
+        "name": "Gulp js",
+        "icon": "https://img.icons8.com/?size=48&id=KNOJLvuHIDAk&format=png"
+    },
+    {
+        "name": "React+Vite",
+        "icon": "https://img.icons8.com/?size=48&id=dJjTWMogzFzg&format=png"
+    }
+
+]
