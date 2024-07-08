@@ -224,7 +224,7 @@ header .navbar ul li a:hover {
 
 .work--box {
   width: 1310px;
-  height: 560px;
+  height: 550px;
   display: flex;
   border: 2px solid white;
   gap: 25px;
@@ -234,7 +234,7 @@ header .navbar ul li a:hover {
   
   .work .work--box {
     width: 360px;
-    height: 1435px;
+    height: 1455px;
     display: block;
     margin: 0 auto;
   }
