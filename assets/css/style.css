@@ -224,7 +224,7 @@ header .navbar ul li a:hover {
 
 .work--box {
   width: 1310px;
-  height: 500px;
+  height: 550px;
   display: flex;
   border: 2px solid white;
   gap: 25px;
@@ -234,7 +234,7 @@ header .navbar ul li a:hover {
   
   .work .work--box {
     width: 360px;
-    height: 1410px;
+    height: 1435px;
     display: block;
     margin: 0 auto;
   }
@@ -250,7 +250,7 @@ header .navbar ul li a:hover {
     margin-top: 40px;
     margin: 0 auto;
     display: block;
-    height: 450px;
+    height: 475px;
   }
   .work .work--box .work--box--in {
     width: 80%;
@@ -276,6 +276,7 @@ header .navbar ul li a:hover {
     gap: 60px;
   }
   .work .work--box .work--box--inn .project {
+    margin-top: 45px;
     gap: 60px;
   }
 
@@ -284,7 +285,7 @@ header .navbar ul li a:hover {
 
 .work--box--in {
   width: 350px;
-  height: 400px;
+  height: 450px;
   border: 2px solid orange;
   margin-left: 25px;
   margin-top: 50px;
@@ -292,7 +293,7 @@ header .navbar ul li a:hover {
 
 .work--box--ini {
   width: 350px;
-  height: 400px;
+  height: 450px;
   border: 3px solid green;
   margin-left: 25px;
   margin-top: 50px;
@@ -306,6 +307,7 @@ header .navbar ul li a:hover {
 
 .work--box--ini p {
   color: white;
+  height: 170px;
   font-size: 17px;
   margin-left: 10px;
   margin-top: 10px;
@@ -322,11 +324,12 @@ header .navbar ul li a:hover {
   font-size: 17px;
   margin-left: 10px;
   margin-top: 10px;
+  height: 170px;
 }
 
 .work--box--inn {
   width: 350px;
-  height: 400px;
+  height: 451px;
   border: 2px solid aqua;
   margin-left: 25px;
   margin-top: 50px;
@@ -342,6 +345,7 @@ header .navbar ul li a:hover {
   font-size: 17px;
   margin-left: 10px;
   margin-top: 10px;
+  height: 170px;
 }
 
 .project {
