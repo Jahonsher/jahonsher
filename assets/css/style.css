@@ -250,7 +250,7 @@ header .navbar ul li a:hover {
     margin-top: 40px;
     margin: 0 auto;
     display: block;
-    height: 475px;
+    height: 495px;
   }
   .work .work--box .work--box--in {
     width: 80%;
@@ -276,7 +276,7 @@ header .navbar ul li a:hover {
     gap: 60px;
   }
   .work .work--box .work--box--inn .project {
-    margin-top: 45px;
+    margin-top: 65px;
     gap: 60px;
   }
 
