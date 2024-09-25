@@ -249,3 +249,23 @@ srtop.reveal('.experience .timeline .container', { interval: 400 });
 /* SCROLL CONTACT */
 srtop.reveal('.contact .container', { delay: 400 });
 srtop.reveal('.contact .container .form-group', { delay: 400 });
+
+
+
+
+
+
+
+document.getElementById('contactForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Shaklni standart yuborishni to'xtatadi
+
+    const serviceID = 'default_service'; // Sizning xizmat ID
+    const templateID = 'template_id'; // Sizning shablon ID
+
+    emailjs.sendForm(serviceID, templateID, this)
+        .then(() => {
+            alert('Xabar yuborildi!');
+        }, (err) => {
+            alert(JSON.stringify(err));
+        });
+});
