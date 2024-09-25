@@ -16,6 +16,7 @@
     crossorigin="anonymous" referrerpolicy="no-referrer" />
   <!-- Favicon -->
   <link id='favicon' rel="shortcut icon" href="./assets/images/favicon.png" type="image/x-png">
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
   <title>Portfolio | Jahonsher</title>
 </head>
 
@@ -454,11 +455,24 @@
 
 
 
-  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-<script>
+  <script>
     (function(){
         emailjs.init('mailto:jahonsherraxmatov@gmail.com'); // O'z user ID'ingizni qo'shing
     })();
+
+    document.getElementById('contactForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Shaklni standart yuborishni to'xtatadi
+
+        const serviceID = 'default_service'; // Sizning xizmat ID
+        const templateID = 'template_id'; // Sizning shablon ID
+
+        emailjs.sendForm(serviceID, templateID, this)
+            .then(() => {
+                alert('Xabar yuborildi!');
+            }, (err) => {
+                alert(JSON.stringify(err));
+            });
+    });
 </script>
 
 </body>
