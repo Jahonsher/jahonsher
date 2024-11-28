@@ -65,10 +65,17 @@
           <li><a class="github" aria-label="GitHub" href="https://github.com/jahonsher" target="_blank"><i
                 class="fab fa-github"></i></a></li>
           <!-- <li><a class="twitter" aria-label="Twitter" href="#" target="_blank"><i class="fab fa-twitter"></i></a></li> -->
-          <li><a class="telegram" aria-label="Telegram" href="https://t.me/jahonsher3" target="_blank"><i
+          <li><a class="telegram" aria-label="Telegram" href="https://t.me/jahonsher03" target="_blank"><i
                 class="fab fa-telegram-plane"></i></a></li>
-          <li><a class="instagram" aria-label="Instagram" href="https://www.instagram.com/jahonsher.03"><i
-                class="fab fa-instagram" target="_blank"></i></a></li>
+          <li><a class="facebook" aria-label="Facebook" href="https://www.facebook.com/profile.php?id=61569355388713" target="_blank"><i
+                class="fab fa-facebook"></i></a></li>
+          <li>
+            <a class="instagram" aria-label="Instagram" href="https://www.instagram.com/jahonsher.03">
+              <i class="fab fa-instagram" target="_blank">
+
+              </i>
+            </a>
+          </li>
           <!-- <li><a class="dev" aria-label="Dev" href="https://dev.to/jigarsable" target="_blank"><i class="fab fa-dev"></i></a></li> -->
         </ul>
       </div>
@@ -195,8 +202,7 @@
         <p>The Green-shop project allows users to browse and purchase flowers online from the comfort of their homes.
           This project was created using Pug.js, Sass, CSS, and HTML.</p>
         <div class="project">
-          <a href="./NotFound404.html"><button><i
-                class="fas fa-laptop-code"></i>view</button></a>
+          <a href="./NotFound404.html"><button><i class="fas fa-laptop-code"></i>view</button></a>
           <a href="./NotFound404.html"><button>
               <> code
             </button></a>
@@ -207,8 +213,7 @@
         <p>The Zlatmax project is primarily focused on knives. This website allows people to browse and purchase a
           variety of knives online. This project was created using Pug.js, Sass, JavaScript CSS, and HTML.</p>
         <div class="project">
-          <a href="./NotFound404.html"><button><i
-                class="fas fa-laptop-code"></i>view</button></a>
+          <a href="./NotFound404.html"><button><i class="fas fa-laptop-code"></i>view</button></a>
           <a href="./NotFound404.html"><button>
               <> code
             </button></a>
@@ -220,8 +225,7 @@
           panel, where students can take tests and earn their coin points. This project was built using Pug.js,
           JavaScript, Sass, HTML, and CSS.</p>
         <div class="project">
-          <a href="./NotFound404.html"><button><i
-                class="fas fa-laptop-code"></i>view</button></a>
+          <a href="./NotFound404.html"><button><i class="fas fa-laptop-code"></i>view</button></a>
           <a href="./NotFound404.html"><button>
               <> code
             </button></a>
@@ -406,14 +410,16 @@
           <a href="https://www.linkedin.com/in/jahonsher-raxmatov-03387b301/" class="fab fa-linkedin"
             aria-label="LinkedIn" target="_blank"></a>
           <a href="https://github.com/jahonsher" class="fab fa-github" aria-label="GitHub" target="_blank"></a>
+          <a href="https://www.facebook.com/profile.php?id=61569355388713" class="fab fa-facebook" aria-label="Facebook" target="_blank"></a>
           <a href="mailto:jahonsherraxmatov@gmail.com" class="fas fa-envelope" aria-label="Mail" target="_blank"></a>
           <!-- <a href="https://twitter.com/jigar_sable" class="fab fa-twitter" aria-label="Twitter" target="_blank"></a> -->
-          <a href="https://t.me/jahonsher3" class="fab fa-telegram-plane" aria-label="Telegram" target="_blank"></a>
+          <a href="https://t.me/jahonsher03" class="fab fa-telegram-plane" aria-label="Telegram" target="_blank"></a>
         </div>
       </div>
     </div>
 
-    <h1 class="credit">Designed with <i class="fa fa-heart pulse"></i> by <a href="mailto:jahonsherraxmatov@gmail.com"> Jahonsher Raxmatov</a></h1>
+    <h1 class="credit">Designed with <i class="fa fa-heart pulse"></i> by <a href="mailto:jahonsherraxmatov@gmail.com">
+        Jahonsher Raxmatov</a></h1>
 
   </section>
   <!-- footer section ends -->
@@ -456,24 +462,24 @@
 
 
   <script>
-    (function(){
-        emailjs.init('mailto:jahonsherraxmatov@gmail.com'); // O'z user ID'ingizni qo'shing
+    (function () {
+      emailjs.init('mailto:jahonsherraxmatov@gmail.com'); // O'z user ID'ingizni qo'shing
     })();
 
-    document.getElementById('contactForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Shaklni standart yuborishni to'xtatadi
+    document.getElementById('contactForm').addEventListener('submit', function (event) {
+      event.preventDefault(); // Shaklni standart yuborishni to'xtatadi
 
-        const serviceID = 'default_service'; // Sizning xizmat ID
-        const templateID = 'template_id'; // Sizning shablon ID
+      const serviceID = 'default_service'; // Sizning xizmat ID
+      const templateID = 'template_id'; // Sizning shablon ID
 
-        emailjs.sendForm(serviceID, templateID, this)
-            .then(() => {
-                alert('Xabar yuborildi!');
-            }, (err) => {
-                alert(JSON.stringify(err));
-            });
+      emailjs.sendForm(serviceID, templateID, this)
+        .then(() => {
+          alert('Xabar yuborildi!');
+        }, (err) => {
+          alert(JSON.stringify(err));
+        });
     });
-</script>
+  </script>
 
 </body>
 
