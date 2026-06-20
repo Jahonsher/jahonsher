@@ -1,0 +1,1190 @@
+{
+  "name": "2 - Skript (Script Flow)",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "n1",
+      "name": "Boshlanish WF1 dan",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -700,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chatId }}",
+        "text": "⏳ So'rovingiz bajarilmoqda...",
+        "additionalFields": {}
+      },
+      "id": "n2",
+      "name": "Bajarilmoqda xabar",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        300
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_TELEGRAM",
+          "name": "Telegram API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "p1",
+              "name": "prompt",
+              "type": "string",
+              "value": "=PLACEHOLDER — bu yerga script-prompt.md matnini joylashtiring (4-qadam)."
+            },
+            {
+              "id": "p2",
+              "name": "geminiModel",
+              "type": "string",
+              "value": "gemini-2.5-flash"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n3",
+      "name": "SCRIPT PROMPT",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -260,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "PASTE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Instagram",
+          "mode": "list",
+          "cachedResultName": "Instagram"
+        },
+        "options": {}
+      },
+      "id": "n4",
+      "name": "Instagram oqish",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        -40,
+        300
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "REPLACE_GOOGLE",
+          "name": "Google API (Service Account)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "PASTE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Skriptlar",
+          "mode": "list",
+          "cachedResultName": "Skriptlar"
+        },
+        "options": {}
+      },
+      "id": "n5",
+      "name": "Skriptlar oqish",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        180,
+        300
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "REPLACE_GOOGLE",
+          "name": "Google API (Service Account)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "PASTE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Raskadrovka",
+          "mode": "list",
+          "cachedResultName": "Raskadrovka"
+        },
+        "options": {}
+      },
+      "id": "n6",
+      "name": "Raskadrovka oqish",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        400,
+        300
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "REPLACE_GOOGLE",
+          "name": "Google API (Service Account)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// \"Vazifani tanlash\" — ustuvorlik A -> S -> B bilan bitta kutilayotgan vazifani tanlaydi.\nconst insta = $('Instagram oqish').all().map((i) => i.json);\nconst skript = $('Skriptlar oqish').all().map((i) => i.json);\nconst rask = $('Raskadrovka oqish').all().map((i) => i.json);\nconst chatId = $('Boshlanish WF1 dan').first().json.chatId;\n\nfunction findFirst(rows, status) {\n  for (const r of rows) {\n    if (String(r['Status'] || '').trim() === status) return r;\n  }\n  return null;\n}\n// Post ID bo'yicha Instagram caption (opisaniya) topish\nfunction captionFor(postId) {\n  for (const r of insta) {\n    if (String(r['Post IDsi'] || '').trim() === String(postId || '').trim()) {\n      return r['Opisaniya'] || '';\n    }\n  }\n  return '';\n}\n\nlet task;\n\nconst a = findFirst(insta, 'Skript yasash');\nif (a) {\n  task = {\n    mode: 'A',\n    havola: a['Havola'],\n    postId: a['Post IDsi'],\n    account: a['Akkaunt'],\n    accountId: a['Akkaunt IDsi'],\n    skriptTili: a['Skript tili'] || 'Uzbek',\n    opisaniya: a['Opisaniya'] || '',\n    instaRow: a.row_number,\n  };\n} else {\n  const s = findFirst(rask, 'Skript yaratish');\n  if (s) {\n    task = {\n      mode: 'S',\n      havola: s['Havola'],\n      postId: s['Post IDsi'],\n      account: s['Akkaunt'],\n      skriptTili: s['Skript tili'] || 'Uzbek',\n      raskadrovka: s['Raskadrovka'] || '',\n      opisaniya: captionFor(s['Post IDsi']),\n      raskRow: s.row_number,\n    };\n  } else {\n    const b = findFirst(skript, 'Qayta yozish');\n    if (b) {\n      task = {\n        mode: 'B',\n        havola: b['Havola'],\n        postId: b['Post IDsi'],\n        account: b['Akkaunt'],\n        oldScript: b['Skript'] || '',\n        opisaniya: b['Opisaniya'] || '',\n        insights: b['Insights skrinshotlari'] || '',\n        skriptRow: b.row_number,\n      };\n    } else {\n      task = { mode: 'none' };\n    }\n  }\n}\n\ntask.chatId = chatId;\nreturn [{ json: task }];\n"
+      },
+      "id": "n7",
+      "name": "Vazifani tanlash",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        620,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.mode }}",
+                    "rightValue": "A",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "A"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.mode }}",
+                    "rightValue": "S",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "S"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.mode }}",
+                    "rightValue": "B",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "B"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "n8",
+      "name": "Rejim",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        840,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v1/instagram/post",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {},
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $('Vazifani tanlash').first().json.havola }}"
+            },
+            {
+              "name": "download_media",
+              "value": "true"
+            }
+          ]
+        }
+      },
+      "id": "n9",
+      "name": "A Post info",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1080,
+        -120
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_SCRAPE",
+          "name": "ScrapeCreators (x-api-key)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('A Post info').first().json.data.xdt_shortcode_media.video_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "data"
+            }
+          }
+        }
+      },
+      "id": "n10",
+      "name": "A Video yuklab olish",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1300,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// \"A Video base64\" — yuklangan videoni base64'ga o'tkazib, Gemini raskadrovka so'rovini quradi.\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\nconst b64 = buffer.toString('base64');\n\nconst task = $('Vazifani tanlash').first().json;\nconst tili = task.skriptTili || 'Uzbek';\n\nconst prompt =\n  'Quyidagi Instagram Reels videosini SONIYALAR bo\\'yicha to\\'liq raskadrovka qil. ' +\n  'Har bir sahna uchun aniq ko\\'rsat: vaqt oralig\\'i (masalan 0-3s, 3-6s ...), ' +\n  'kadrda nima ko\\'rinayapti, ekrandagi matnlar (text overlay), personajlar harakati, ' +\n  'kamera harakati, montaj va o\\'tishlar (transition), ovoz/musiqa hissi. ' +\n  'Iloji boricha batafsil va tartibli yoz. Javobni ' + tili + ' tilida yoz.';\n\nconst geminiBody = {\n  contents: [\n    {\n      parts: [\n        { inline_data: { mime_type: 'video/mp4', data: b64 } },\n        { text: prompt },\n      ],\n    },\n  ],\n  generationConfig: { temperature: 0.4, maxOutputTokens: 8192 },\n};\n\nreturn [{ json: { geminiBody: geminiBody } }];\n"
+      },
+      "id": "n11",
+      "name": "A Video base64",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $('SCRIPT PROMPT').first().json.geminiModel }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.geminiBody) }}",
+        "options": {}
+      },
+      "id": "n12",
+      "name": "A Gemini RASKADROVKA",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1740,
+        -120
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GEMINI",
+          "name": "Gemini (x-goog-api-key)"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// \"A Raskadrovka matni\" — Gemini javobidan matnni yig'adi va Raskadrovka qatorini tayyorlaydi.\nconst resp = $input.first().json || {};\nlet text = '';\ntry {\n  const parts = resp.candidates[0].content.parts;\n  text = parts.map((p) => p.text || '').join('\\n').trim();\n} catch (e) {\n  text = '';\n}\nif (!text) {\n  text = '[Raskadrovka olinmadi — Gemini javobini tekshiring. Xato: ' +\n    JSON.stringify(resp.error || resp).slice(0, 300) + ']';\n}\n\nconst task = $('Vazifani tanlash').first().json;\nconst sana = new Date().toISOString().slice(0, 10);\n\nreturn [\n  {\n    json: {\n      'Sana': sana,\n      'Akkaunt': task.account,\n      'Post IDsi': task.postId,\n      'Havola': task.havola,\n      'Skript tili': task.skriptTili,\n      'Raskadrovka': text,\n      'Status': 'Tayyor',\n    },\n  },\n];\n"
+      },
+      "id": "n13",
+      "name": "A Raskadrovka matni",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1960,
+        -120
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "PASTE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Raskadrovka",
+          "mode": "list",
+          "cachedResultName": "Raskadrovka"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "id": "n14",
+      "name": "A Raskadrovka append",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2180,
+        -120
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "REPLACE_GOOGLE",
+          "name": "Google API (Service Account)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "PASTE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Instagram",
+          "mode": "list",
+          "cachedResultName": "Instagram"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Vazifani tanlash').first().json.instaRow }}",
+            "Status": "Raskadrovka tayyor"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n15",
+      "name": "A Instagram yangilash",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2400,
+        -120
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "REPLACE_GOOGLE",
+          "name": "Google API (Service Account)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Vazifani tanlash').first().json.chatId }}",
+        "text": "✅ Raskadrovka tayyor! Skript yozdirish uchun o'sha qatorda Status='Skript yaratish' qiling va /script yuboring.",
+        "additionalFields": {}
+      },
+      "id": "n16",
+      "name": "A xabar",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2620,
+        -120
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_TELEGRAM",
+          "name": "Telegram API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.scrapecreators.com/v2/instagram/media/transcript",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {},
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $('Vazifani tanlash').first().json.havola }}"
+            }
+          ]
+        }
+      },
+      "id": "n17",
+      "name": "S Transcript",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1080,
+        200
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_SCRAPE",
+          "name": "ScrapeCreators (x-api-key)"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// \"S Skript prompt\" — transcript + raskadrovka + caption asosida yakuniy Gemini promptini quradi.\nconst task = $('Vazifani tanlash').first().json;\nconst sp = $('SCRIPT PROMPT').first().json;\n\nlet transcript = '';\ntry {\n  const r = $input.first().json || {};\n  transcript = r.transcript || r.text ||\n    (r.data && (r.data.transcript || r.data.text)) || '';\n  if (typeof transcript === 'object') transcript = JSON.stringify(transcript);\n} catch (e) {\n  transcript = '';\n}\n\nconst tili = task.skriptTili || 'Uzbek';\nconst basePrompt = sp.prompt || '';\n\nconst prompt =\n  basePrompt +\n  '\\n\\n--- SKRIPT TILI: ' + tili + ' ---\\n' +\n  '\\nTRANSKRIPT (asl video matni):\\n' + (transcript || '(yo\\'q)') +\n  '\\n\\nRASKADROVKA (asl video tahlili):\\n' + (task.raskadrovka || '(yo\\'q)') +\n  '\\n\\nVIDEO TAVSIFI (caption):\\n' + (task.opisaniya || '(yo\\'q)') +\n  '\\n\\nYUQORIDAGILARDAN foydalanib, ' + tili +\n  ' tilida YANGI, original va viral bo\\'ladigan tayyor video skript yoz. ' +\n  'Skript hook (birinchi 3 soniya), asosiy qism va call-to-action bilan tuzilgan bo\\'lsin.';\n\nconst geminiBody = {\n  contents: [{ parts: [{ text: prompt }] }],\n  generationConfig: { temperature: 0.9, maxOutputTokens: 8192 },\n};\n\nreturn [{ json: { geminiBody: geminiBody } }];\n"
+      },
+      "id": "n18",
+      "name": "S Skript prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $('SCRIPT PROMPT').first().json.geminiModel }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.geminiBody) }}",
+        "options": {}
+      },
+      "id": "n19",
+      "name": "S Gemini SKRIPT",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1520,
+        200
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GEMINI",
+          "name": "Gemini (x-goog-api-key)"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// \"S Skript matni\" — Gemini javobidan skriptni oladi va Skriptlar qatorini tayyorlaydi.\n// MUHIM: raskadrovka SHU qatorga ham yoziladi.\nconst resp = $input.first().json || {};\nlet text = '';\ntry {\n  text = resp.candidates[0].content.parts.map((p) => p.text || '').join('\\n').trim();\n} catch (e) {\n  text = '';\n}\nif (!text) {\n  text = '[Skript olinmadi — Gemini javobini tekshiring. Xato: ' +\n    JSON.stringify(resp.error || resp).slice(0, 300) + ']';\n}\n\nconst task = $('Vazifani tanlash').first().json;\nconst sana = new Date().toISOString().slice(0, 10);\n\nreturn [\n  {\n    json: {\n      'Sana': sana,\n      'Manba': task.havola,\n      'Skript': text,\n      'Raskadrovka': task.raskadrovka || '',\n      'Kamentlar': '',\n      'Opisaniya': task.opisaniya || '',\n      'Status': 'Tayyor',\n      'Havola': task.havola,\n      'Akkaunt': task.account,\n      'Post IDsi': task.postId,\n      'Insights skrinshotlari': '',\n    },\n  },\n];\n"
+      },
+      "id": "n20",
+      "name": "S Skript matni",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1740,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "PASTE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Skriptlar",
+          "mode": "list",
+          "cachedResultName": "Skriptlar"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": []
+        },
+        "options": {}
+      },
+      "id": "n21",
+      "name": "S Skriptlar append",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1960,
+        200
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "REPLACE_GOOGLE",
+          "name": "Google API (Service Account)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "PASTE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Raskadrovka",
+          "mode": "list",
+          "cachedResultName": "Raskadrovka"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Vazifani tanlash').first().json.raskRow }}",
+            "Status": "Skript tayyor"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n22",
+      "name": "S Raskadrovka yangilash",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2180,
+        200
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "REPLACE_GOOGLE",
+          "name": "Google API (Service Account)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Vazifani tanlash').first().json.chatId }}",
+        "text": "✅ Skript tayyor! Skriptlar varag'ini tekshiring.",
+        "additionalFields": {}
+      },
+      "id": "n23",
+      "name": "S xabar",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2400,
+        200
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_TELEGRAM",
+          "name": "Telegram API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// \"B malumot\" — Raskadrovka varag'idan shu Post ID'ga mos raskadrovka/tilni topadi,\n// Insights skrinshotlari matnidan URL'larni ajratadi.\nconst task = $('Vazifani tanlash').first().json;\nconst rask = $('Raskadrovka oqish').all().map((i) => i.json);\n\nlet referans = '';\nlet tili = 'Uzbek';\nconst pid = String(task.postId || '').trim();\nfor (const r of rask) {\n  if (String(r['Post IDsi'] || '').trim() === pid) {\n    referans = r['Raskadrovka'] || '';\n    tili = r['Skript tili'] || tili;\n    break;\n  }\n}\n\nconst urls = (String(task.insights || '').match(/https?:\\/\\/[^\\s,;\"']+/g) || []).slice(0, 6);\n\nreturn [\n  {\n    json: {\n      referans: referans,\n      tili: tili,\n      urls: urls,\n      oldScript: task.oldScript || '',\n      opisaniya: task.opisaniya || '',\n    },\n  },\n];\n"
+      },
+      "id": "n24",
+      "name": "B malumot",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// \"B Skrinshot va body\" — har bir Insights skrinshot URL'ini yuklab base64'ga o'tkazadi,\n// inline rasm sifatida qo'shadi va qayta yozish promptini quradi.\nconst data = $input.first().json;\nconst parts = [];\n\nconst prompt =\n  'Quyida KAM ko\\'rilgan (viral bo\\'lmagan) Instagram videoning Insights statistikasi skrinshotlari, ' +\n  'referans (yaxshi ishlagan) videoning raskadrovkasi va eski skript berilgan.\\n' +\n  '1) AVVAL Insights skrinshotlariga qarab, eski video NEGA viral bo\\'lmaganini batafsil tahlil qil ' +\n  '(retention, hook, ko\\'rilish manbalari va h.k.).\\n' +\n  '2) SO\\'NG referans raskadrovka va eski skript asosida, ' + (data.tili || 'Uzbek') +\n  ' tilida VIRAL bo\\'ladigan qilib skriptni QAYTA YOZ. ' +\n  'Yangi skript kuchli hook, aniq struktura va call-to-action bilan bo\\'lsin.\\n\\n' +\n  'ESKI SKRIPT:\\n' + (data.oldScript || '(yo\\'q)') +\n  '\\n\\nREFERANS RASKADROVKA:\\n' + (data.referans || '(yo\\'q)') +\n  '\\n\\nVIDEO TAVSIFI:\\n' + (data.opisaniya || '(yo\\'q)');\n\nfor (const u of data.urls || []) {\n  try {\n    const buf = await this.helpers.httpRequest({\n      url: u,\n      method: 'GET',\n      encoding: 'arraybuffer',\n      returnFullResponse: false,\n    });\n    const b64 = Buffer.from(buf).toString('base64');\n    let mime = 'image/jpeg';\n    if (/\\.png(\\?|$)/i.test(u)) mime = 'image/png';\n    else if (/\\.webp(\\?|$)/i.test(u)) mime = 'image/webp';\n    parts.push({ inline_data: { mime_type: mime, data: b64 } });\n  } catch (e) {\n    // bu rasmni o'tkazib yuboramiz\n  }\n}\n\nparts.push({ text: prompt });\n\nconst geminiBody = {\n  contents: [{ parts: parts }],\n  generationConfig: { temperature: 0.9, maxOutputTokens: 8192 },\n};\n\nreturn [{ json: { geminiBody: geminiBody } }];\n"
+      },
+      "id": "n25",
+      "name": "B Skrinshot va body",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1300,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $('SCRIPT PROMPT').first().json.geminiModel }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.geminiBody) }}",
+        "options": {}
+      },
+      "id": "n26",
+      "name": "B Gemini QAYTA YOZISH",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1520,
+        480
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_GEMINI",
+          "name": "Gemini (x-goog-api-key)"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// \"B Qayta yozilgan\" — Gemini javobidan yangi (qayta yozilgan) skriptni oladi.\nconst resp = $input.first().json || {};\nlet text = '';\ntry {\n  text = resp.candidates[0].content.parts.map((p) => p.text || '').join('\\n').trim();\n} catch (e) {\n  text = '';\n}\nif (!text) {\n  text = '[Qayta yozilgan skript olinmadi — Gemini javobini tekshiring. Xato: ' +\n    JSON.stringify(resp.error || resp).slice(0, 300) + ']';\n}\n\nconst task = $('Vazifani tanlash').first().json;\n\nreturn [\n  {\n    json: {\n      'row_number': task.skriptRow,\n      'Skript': text,\n      'Status': 'Qayta yozilgan',\n    },\n  },\n];\n"
+      },
+      "id": "n27",
+      "name": "B Qayta yozilgan",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1740,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "PASTE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Skriptlar",
+          "mode": "list",
+          "cachedResultName": "Skriptlar"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.row_number }}",
+            "Skript": "={{ $json.Skript }}",
+            "Status": "={{ $json.Status }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Skript",
+              "displayName": "Skript",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "n28",
+      "name": "B Skriptlar yangilash",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1960,
+        480
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "REPLACE_GOOGLE",
+          "name": "Google API (Service Account)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Vazifani tanlash').first().json.chatId }}",
+        "text": "✅ Qayta yozilgan skript tayyor!",
+        "additionalFields": {}
+      },
+      "id": "n29",
+      "name": "B xabar",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2180,
+        480
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_TELEGRAM",
+          "name": "Telegram API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Vazifani tanlash').first().json.chatId }}",
+        "text": "ℹ️ Hozircha vazifa yo'q.\n\nIshlash tartibi:\n• Instagram varag'ida Status='Skript yasash' → raskadrovka qiladi\n• Raskadrovka varag'ida Status='Skript yaratish' → skript yozadi\n• Skriptlar varag'ida Status='Qayta yozish' → qayta yozadi",
+        "additionalFields": {}
+      },
+      "id": "n30",
+      "name": "none xabar",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1080,
+        760
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_TELEGRAM",
+          "name": "Telegram API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Boshlanish WF1 dan": {
+      "main": [
+        [
+          {
+            "node": "Bajarilmoqda xabar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bajarilmoqda xabar": {
+      "main": [
+        [
+          {
+            "node": "SCRIPT PROMPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SCRIPT PROMPT": {
+      "main": [
+        [
+          {
+            "node": "Instagram oqish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Instagram oqish": {
+      "main": [
+        [
+          {
+            "node": "Skriptlar oqish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skriptlar oqish": {
+      "main": [
+        [
+          {
+            "node": "Raskadrovka oqish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Raskadrovka oqish": {
+      "main": [
+        [
+          {
+            "node": "Vazifani tanlash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vazifani tanlash": {
+      "main": [
+        [
+          {
+            "node": "Rejim",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rejim": {
+      "main": [
+        [
+          {
+            "node": "A Post info",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "S Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "B malumot",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "none xabar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "A Post info": {
+      "main": [
+        [
+          {
+            "node": "A Video yuklab olish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "A Video yuklab olish": {
+      "main": [
+        [
+          {
+            "node": "A Video base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "A Video base64": {
+      "main": [
+        [
+          {
+            "node": "A Gemini RASKADROVKA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "A Gemini RASKADROVKA": {
+      "main": [
+        [
+          {
+            "node": "A Raskadrovka matni",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "A Raskadrovka matni": {
+      "main": [
+        [
+          {
+            "node": "A Raskadrovka append",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "A Raskadrovka append": {
+      "main": [
+        [
+          {
+            "node": "A Instagram yangilash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "A Instagram yangilash": {
+      "main": [
+        [
+          {
+            "node": "A xabar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S Transcript": {
+      "main": [
+        [
+          {
+            "node": "S Skript prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S Skript prompt": {
+      "main": [
+        [
+          {
+            "node": "S Gemini SKRIPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S Gemini SKRIPT": {
+      "main": [
+        [
+          {
+            "node": "S Skript matni",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S Skript matni": {
+      "main": [
+        [
+          {
+            "node": "S Skriptlar append",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S Skriptlar append": {
+      "main": [
+        [
+          {
+            "node": "S Raskadrovka yangilash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "S Raskadrovka yangilash": {
+      "main": [
+        [
+          {
+            "node": "S xabar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "B malumot": {
+      "main": [
+        [
+          {
+            "node": "B Skrinshot va body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "B Skrinshot va body": {
+      "main": [
+        [
+          {
+            "node": "B Gemini QAYTA YOZISH",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "B Gemini QAYTA YOZISH": {
+      "main": [
+        [
+          {
+            "node": "B Qayta yozilgan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "B Qayta yozilgan": {
+      "main": [
+        [
+          {
+            "node": "B Skriptlar yangilash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "B Skriptlar yangilash": {
+      "main": [
+        [
+          {
+            "node": "B xabar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}
