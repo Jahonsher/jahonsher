@@ -1,0 +1,826 @@
+{
+  "name": "1 - Qidiruv (POLLING)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 10
+            }
+          ]
+        }
+      },
+      "id": "Schedule_Trigger",
+      "name": "Har 10 soniya",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -560,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "t1",
+              "name": "token",
+              "value": "PASTE_BOT_TOKEN_HERE",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "TG_TOKEN",
+      "name": "TG TOKEN",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -360,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sd = $getWorkflowStaticData('global');\nconst offset = sd.tgOffset || 0;\nconst token = $('TG TOKEN').first().json.token;\nreturn [{ json: { offset, token } }];"
+      },
+      "id": "Offset_olish",
+      "name": "Offset olish",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.telegram.org/bot{{ $json.token }}/getUpdates",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "offset",
+              "value": "={{ $json.offset }}"
+            },
+            {
+              "name": "timeout",
+              "value": "0"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "getUpdates",
+      "name": "getUpdates",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        40,
+        400
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const resp = $input.first().json || {};\nconst result = Array.isArray(resp.result) ? resp.result : [];\nif (result.length === 0) return [];\nconst sd = $getWorkflowStaticData('global');\nsd.tgOffset = result[result.length - 1].update_id + 1;\nreturn result\n  .filter(u => u && u.message && typeof u.message.text === 'string')\n  .map(u => ({ json: u }));"
+      },
+      "id": "Yangi_xabarlar",
+      "name": "Yangi xabarlar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "search",
+                    "leftValue": "={{ ($json.message && $json.message.text) || '' }}",
+                    "rightValue": "/search",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "search"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "script",
+                    "leftValue": "={{ ($json.message && $json.message.text) || '' }}",
+                    "rightValue": "/script",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "script"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "Buyruqni_aniqlash",
+      "name": "Buyruqni aniqlash",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        440,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Yangi xabarlar').first().json.message.chat.id }}",
+        "text": "🔎 Videolaringiz qidirilmoqda... Biroz kuting.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "Qidirilmoqda_xabar",
+      "name": "Qidirilmoqda xabar",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        680,
+        200
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_TELEGRAM",
+          "name": "Telegram API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "Buyruqlar"
+        },
+        "options": {}
+      },
+      "id": "Buyruqlar_oqish",
+      "name": "Buyruqlar oqish",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        900,
+        200
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "REPLACE_GOOGLE",
+          "name": "Google API (Service Account)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(i => i.json);\nconst S = v => (v == null ? '' : v.toString().trim());\nlet chosen = null;\nfor (const r of rows) { if (S(r['Status']) === 'Boshlash') chosen = r; }\nif (!chosen && rows.length) chosen = rows[rows.length - 1];\nif (!chosen) throw new Error(\"Buyruqlar varagi bosh — kamida 1 qator toldiring.\");\nconst vaqtMap = {\n  'Bugun': { date_posted: 'last-day', cutoffDays: 1 },\n  'Oxirgi hafta': { date_posted: 'last-week', cutoffDays: 7 },\n  'Oxirgi oy': { date_posted: 'last-month', cutoffDays: 30 },\n  'Oxirgi 3 oy': { date_posted: 'last-year', cutoffDays: 90 },\n  'Oxirgi 6 oy': { date_posted: 'last-year', cutoffDays: 180 },\n  \"So'ngi yil\": { date_posted: 'last-year', cutoffDays: 365 }\n};\nconst vaqt = S(chosen['Vaqt']);\nconst vm = vaqtMap[vaqt] || { date_posted: 'last-month', cutoffDays: 30 };\nconst miqdor = parseInt(chosen['Miqdor'], 10) || 10;\nreturn [{ json: { query: S(chosen['Buyruq']), miqdor, date_posted: vm.date_posted,\n  cutoffDays: vm.cutoffDays, rowNumber: chosen.row_number } }];"
+      },
+      "id": "Buyruqni_tanlash",
+      "name": "Buyruqni tanlash",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "Instagram"
+        },
+        "options": {}
+      },
+      "id": "Instagram_dedup_oqish",
+      "name": "Instagram dedup oqish",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1340,
+        200
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "REPLACE_GOOGLE",
+          "name": "Google API (Service Account)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const cfg = $('Buyruqni tanlash').first().json;\nconst existingRows = $('Instagram dedup oqish').all().map(i => i.json);\nconst existing = {};\nfor (const r of existingRows) {\n  const id = (r['Post IDsi'] == null ? '' : r['Post IDsi'].toString().trim());\n  if (id) existing[id] = true;\n}\nconst sd = $getWorkflowStaticData('global');\nsd.searchState = { query: cfg.query, date_posted: cfg.date_posted,\n  cutoffTs: Math.floor(Date.now() / 1000) - cfg.cutoffDays * 24 * 60 * 60,\n  miqdor: cfg.miqdor, rowNumber: cfg.rowNumber, page: 1, startTime: Date.now(),\n  collected: [], existing, noMore: false };\nreturn [{ json: { started: true } }];"
+      },
+      "id": "Loop_sozlash",
+      "name": "Loop sozlash",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1560,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const s = $getWorkflowStaticData('global').searchState;\nlet done = false;\nif (Date.now() - s.startTime > 5 * 60 * 1000) done = true;\nif (s.collected.length >= s.miqdor) done = true;\nif (s.noMore) done = true;\nif (s.page > 20) done = true;\nreturn [{ json: { done, page: s.page, collected: s.collected.length } }];"
+      },
+      "id": "Tekshirish",
+      "name": "Tekshirish",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1780,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.done }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "Davom_etamizmi",
+      "name": "Davom etamizmi",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2000,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.scrapecreators.com/v2/instagram/reels/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $getWorkflowStaticData('global').searchState.query }}"
+            },
+            {
+              "name": "date_posted",
+              "value": "={{ $getWorkflowStaticData('global').searchState.date_posted }}"
+            },
+            {
+              "name": "page",
+              "value": "={{ $getWorkflowStaticData('global').searchState.page }}"
+            }
+          ]
+        },
+        "options": {},
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "id": "ScrapeCreators_qidiruv",
+      "name": "ScrapeCreators qidiruv",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2220,
+        400
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REPLACE_SCRAPECREATORS",
+          "name": "scrape creators"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const s = $getWorkflowStaticData('global').searchState;\nconst resp = $input.first().json || {};\nfunction pick(o, paths) {\n  for (const p of paths) {\n    const v = p.split('.').reduce((a, k) => (a == null ? undefined : a[k]), o);\n    if (v !== undefined && v !== null && v !== '') return v;\n  }\n  return undefined;\n}\nlet reels = resp.reels || resp.data || resp.items || resp.results || [];\nif (!Array.isArray(reels)) reels = [];\nif (reels.length === 0) { s.noMore = true; }\nfor (const reel of reels) {\n  const m = reel.media || reel.node || reel;\n  let id = (pick(m, ['id', 'pk', 'code', 'shortcode']) || '').toString();\n  id = id.split('_')[0];\n  if (!id) continue;\n  if (s.existing[id]) continue;\n  if (s.collected.find(c => c.postId === id)) continue;\n  const views = Number(pick(m, ['play_count', 'ig_play_count', 'view_count', 'views']) || 0);\n  if (!(views > 10000)) continue;\n  const takenAt = Number(pick(m, ['taken_at', 'taken_at_timestamp', 'device_timestamp']) || 0);\n  if (takenAt && takenAt < s.cutoffTs) continue;\n  const shortcode = pick(m, ['code', 'shortcode']) || '';\n  const likes = Number(pick(m, ['like_count', 'likes']) || 0);\n  const comments = Number(pick(m, ['comment_count', 'comments']) || 0);\n  const user = m.user || m.owner || {};\n  const username = pick(user, ['username']) || '';\n  const followers = Number(pick(user, ['follower_count', 'followers']) || 0);\n  const accountId = (pick(user, ['pk', 'id']) || '').toString();\n  let caption = pick(m, ['caption.text']);\n  if (!caption && typeof m.caption === 'string') caption = m.caption;\n  caption = caption || '';\n  s.collected.push({ postId: id, shortcode, views, likes, comments, takenAt, username, followers, accountId, caption });\n}\ns.page = s.page + 1;\nreturn [{ json: { collected: s.collected.length, page: s.page } }];"
+      },
+      "id": "Filtr_va_yigish",
+      "name": "Filtr va yigish",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2440,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const s = $getWorkflowStaticData('global').searchState;\nconst list = s.collected.slice(0, s.miqdor);\nfunction faollik(views, likes, followers) {\n  let reach;\n  if (followers > 0) {\n    const ratio = views / followers;\n    reach = Math.min(100, (Math.log10(ratio + 1) / Math.log10(11)) * 100);\n  } else {\n    reach = views > 50000 ? 100 : (views / 50000) * 100;\n  }\n  let eng = 0;\n  if (views > 0) { const er = likes / views; eng = Math.min(100, (er / 0.10) * 100); }\n  return Math.round(Math.min(100, Math.max(0, 0.6 * reach + 0.4 * eng)));\n}\nconst today = new Date().toISOString().slice(0, 10);\nconst videos = list.map(c => ({\n  'Akkaunt': c.username, 'Opisaniya': c.caption,\n  'Havola': c.shortcode ? `https://www.instagram.com/reel/${c.shortcode}/` : '',\n  'Status': 'Yangi', 'Skript tili': 'Uzbek', 'Obunachilar': c.followers,\n  'Faollik': faollik(c.views, c.likes, c.followers), \"Ko'rilishlar\": c.views,\n  'Layklar': c.likes, 'Kommentlar': c.comments,\n  'Post sanasi': c.takenAt ? new Date(c.takenAt * 1000).toISOString().slice(0, 10) : '',\n  'Kiritilish sanasi': today, 'Post IDsi': c.postId, 'Akkaunt IDsi': c.accountId\n}));\nreturn [{ json: { videos, savedCount: videos.length, rowNumber: s.rowNumber } }];"
+      },
+      "id": "Yakuniy_natija",
+      "name": "Yakuniy natija",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2220,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nif (!data.videos || data.videos.length === 0) return [{ json: { _empty: true } }];\nreturn data.videos.map(v => ({ json: v }));"
+      },
+      "id": "Videolarni_yoyish",
+      "name": "Videolarni yoyish",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2440,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "Instagram"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "Instagram_yozish",
+      "name": "Instagram yozish",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2660,
+        60
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "REPLACE_GOOGLE",
+          "name": "Google API (Service Account)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: $('Yakuniy natija').first().json }];"
+      },
+      "id": "Yakunlash_1ta",
+      "name": "Yakunlash 1ta",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2880,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "Buyruqlar"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Yakuniy natija').first().json.rowNumber }}",
+            "Status": "Tayyor"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "Buyruqlar_tayyor",
+      "name": "Buyruqlar tayyor",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        3100,
+        60
+      ],
+      "credentials": {
+        "googleApi": {
+          "id": "REPLACE_GOOGLE",
+          "name": "Google API (Service Account)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Yangi xabarlar').first().json.message.chat.id }}",
+        "text": "={{ '✅ ' + $('Yakuniy natija').first().json.savedCount + ' ta video jadvalga saqlandi!' }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "id": "Saqlandi_xabar",
+      "name": "Saqlandi xabar",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3320,
+        60
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "REPLACE_TELEGRAM",
+          "name": "Telegram API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ch",
+              "name": "chatId",
+              "value": "={{ $('Yangi xabarlar').first().json.message.chat.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "chatId_tayyorlash",
+      "name": "chatId tayyorlash",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        680,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "",
+          "cachedResultName": "2 - Skript (Script Flow)"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "chatId": "={{ $json.chatId }}"
+          },
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "Skript_oqimini_chaqirish",
+      "name": "Skript oqimini chaqirish",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        900,
+        700
+      ]
+    }
+  ],
+  "connections": {
+    "Har 10 soniya": {
+      "main": [
+        [
+          {
+            "node": "TG TOKEN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TG TOKEN": {
+      "main": [
+        [
+          {
+            "node": "Offset olish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Offset olish": {
+      "main": [
+        [
+          {
+            "node": "getUpdates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getUpdates": {
+      "main": [
+        [
+          {
+            "node": "Yangi xabarlar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Yangi xabarlar": {
+      "main": [
+        [
+          {
+            "node": "Buyruqni aniqlash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buyruqni aniqlash": {
+      "main": [
+        [
+          {
+            "node": "Qidirilmoqda xabar",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "chatId tayyorlash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qidirilmoqda xabar": {
+      "main": [
+        [
+          {
+            "node": "Buyruqlar oqish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buyruqlar oqish": {
+      "main": [
+        [
+          {
+            "node": "Buyruqni tanlash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buyruqni tanlash": {
+      "main": [
+        [
+          {
+            "node": "Instagram dedup oqish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Instagram dedup oqish": {
+      "main": [
+        [
+          {
+            "node": "Loop sozlash",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop sozlash": {
+      "main": [
+        [
+          {
+            "node": "Tekshirish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tekshirish": {
+      "main": [
+        [
+          {
+            "node": "Davom etamizmi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Davom etamizmi": {
+      "main": [
+        [
+          {
+            "node": "Yakuniy natija",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ScrapeCreators qidiruv",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ScrapeCreators qidiruv": {
+      "main": [
+        [
+          {
+            "node": "Filtr va yigish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtr va yigish": {
+      "main": [
+        [
+          {
+            "node": "Tekshirish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Yakuniy natija": {
+      "main": [
+        [
+          {
+            "node": "Videolarni yoyish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Videolarni yoyish": {
+      "main": [
+        [
+          {
+            "node": "Instagram yozish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Instagram yozish": {
+      "main": [
+        [
+          {
+            "node": "Yakunlash 1ta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Yakunlash 1ta": {
+      "main": [
+        [
+          {
+            "node": "Buyruqlar tayyor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buyruqlar tayyor": {
+      "main": [
+        [
+          {
+            "node": "Saqlandi xabar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "chatId tayyorlash": {
+      "main": [
+        [
+          {
+            "node": "Skript oqimini chaqirish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}
