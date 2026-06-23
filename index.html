@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Jahonsher Raxmatov — Frontend dasturchi. Vue, React va zamonaviy web texnologiyalari bo'yicha portfolio." />
+  <meta name="author" content="Jahonsher Raxmatov" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Jahonsher Raxmatov — Frontend Developer" />
+  <meta property="og:description" content="Zamonaviy, tez va chiroyli web ilovalar yarataman." />
+  <meta property="og:url" content="https://jahonsher.vercel.app" />
+
+  <title>Jahonsher Raxmatov — Frontend Developer</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Animated background -->
+  <div class="bg-orbs" aria-hidden="true">
+    <span class="orb orb--1"></span>
+    <span class="orb orb--2"></span>
+    <span class="orb orb--3"></span>
+  </div>
+
+  <!-- Navigation -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner">
+      <a href="#hero" class="nav__brand">
+        <span class="nav__logo">JR</span>
+        <span class="nav__name">Jahonsher</span>
+      </a>
+
+      <nav class="nav__links" id="navLinks">
+        <a href="#about" class="nav__link">Men haqimda</a>
+        <a href="#skills" class="nav__link">Ko'nikmalar</a>
+        <a href="#projects" class="nav__link">Loyihalar</a>
+        <a href="#contact" class="nav__link">Aloqa</a>
+        <a href="https://t.me/jahonsher" target="_blank" rel="noopener" class="btn btn--small">Bog'lanish</a>
+      </nav>
+
+      <button class="nav__toggle" id="navToggle" aria-label="Menyu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero" id="hero">
+      <div class="container hero__inner">
+        <div class="hero__content reveal">
+          <p class="hero__eyebrow">👋 Salom, men Jahonsher</p>
+          <h1 class="hero__title">
+            Men <span class="grad-text">zamonaviy web</span><br />
+            ilovalar yarataman
+          </h1>
+          <p class="hero__lead">
+            Frontend dasturchiman. Foydalanuvchiga qulay, tez va chiroyli
+            interfeyslarni Vue, React va zamonaviy texnologiyalar yordamida
+            hayotga tatbiq etaman.
+          </p>
+
+          <div class="hero__actions">
+            <a href="#projects" class="btn btn--primary">Loyihalarni ko'rish</a>
+            <a href="#contact" class="btn btn--ghost">Bog'lanish</a>
+          </div>
+
+          <div class="hero__stats">
+            <div class="stat">
+              <span class="stat__num" data-count="3">0</span><span class="stat__plus">+</span>
+              <span class="stat__label">Yillik tajriba</span>
+            </div>
+            <div class="stat">
+              <span class="stat__num" data-count="20">0</span><span class="stat__plus">+</span>
+              <span class="stat__label">Loyiha</span>
+            </div>
+            <div class="stat">
+              <span class="stat__num" data-count="12">0</span><span class="stat__plus">+</span>
+              <span class="stat__label">Texnologiya</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero__visual reveal">
+          <div class="code-card">
+            <div class="code-card__bar">
+              <span></span><span></span><span></span>
+              <em>developer.js</em>
+            </div>
+            <pre class="code-card__body"><code><span class="c-key">const</span> <span class="c-var">jahonsher</span> = {
+  <span class="c-prop">role</span>: <span class="c-str">'Frontend Developer'</span>,
+  <span class="c-prop">stack</span>: [<span class="c-str">'Vue'</span>, <span class="c-str">'React'</span>, <span class="c-str">'TS'</span>],
+  <span class="c-prop">focus</span>: <span class="c-str">'Clean UI &amp; UX'</span>,
+  <span class="c-prop">coffee</span>: <span class="c-key">true</span>,
+  <span class="c-fn">build</span>() {
+    <span class="c-key">return</span> <span class="c-str">'🚀 great products'</span>;
+  },
+};</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <a href="#about" class="hero__scroll" aria-label="Pastga">
+        <span class="mouse"><span></span></span>
+      </a>
+    </section>
+
+    <!-- About -->
+    <section class="section" id="about">
+      <div class="container">
+        <div class="section__head reveal">
+          <span class="section__tag">01 — Men haqimda</span>
+          <h2 class="section__title">Salom, men <span class="grad-text">Jahonsher Raxmatov</span></h2>
+        </div>
+
+        <div class="about__grid">
+          <div class="about__text reveal">
+            <p>
+              Men ishtiyoqli frontend dasturchiman. Maqsadim — nafaqat ishlaydigan,
+              balki foydalanuvchi uchun yoqimli va intuitiv mahsulotlar yaratish.
+            </p>
+            <p>
+              Har kuni yangi narsalarni o'rganaman va bilimlarimni amaliy
+              loyihalarda qo'llashga harakat qilaman. Toza kod, chiroyli dizayn va
+              tezkor ishlash — bu mening ustuvor yo'nalishlarim.
+            </p>
+
+            <ul class="about__list">
+              <li>🎯 Foydalanuvchiga yo'naltirilgan interfeyslar</li>
+              <li>⚡ Tez va optimallashtirilgan ilovalar</li>
+              <li>📱 To'liq responsive dizayn</li>
+              <li>🧩 Qayta ishlatiluvchi komponentlar</li>
+            </ul>
+
+            <a href="https://github.com/jahonsher" target="_blank" rel="noopener" class="btn btn--primary">
+              GitHub profilim
+            </a>
+          </div>
+
+          <div class="about__cards">
+            <article class="info-card reveal">
+              <div class="info-card__icon">🎨</div>
+              <h3>Dizayn</h3>
+              <p>Canva va Figma yordamida chiroyli vizual yechimlar.</p>
+            </article>
+            <article class="info-card reveal">
+              <div class="info-card__icon">💻</div>
+              <h3>Development</h3>
+              <p>Vue, React va TypeScript bilan ishonchli ilovalar.</p>
+            </article>
+            <article class="info-card reveal">
+              <div class="info-card__icon">📚</div>
+              <h3>Ta'lim</h3>
+              <p>Codecademy, Udemy, Coursera & freeCodeCamp.</p>
+            </article>
+            <article class="info-card reveal">
+              <div class="info-card__icon">🎮</div>
+              <h3>Hobbi</h3>
+              <p>O'yinlar va yangi texnologiyalarni kashf etish.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills -->
+    <section class="section section--alt" id="skills">
+      <div class="container">
+        <div class="section__head reveal">
+          <span class="section__tag">02 — Ko'nikmalar</span>
+          <h2 class="section__title">Texnologiyalar & <span class="grad-text">vositalar</span></h2>
+          <p class="section__sub">Kundalik ishimda foydalanadigan asosiy texnologiyalar.</p>
+        </div>
+
+        <div class="skills">
+          <div class="skill-group reveal">
+            <h3 class="skill-group__title">Tillar</h3>
+            <div class="chips">
+              <span class="chip">HTML5</span>
+              <span class="chip">CSS3</span>
+              <span class="chip">JavaScript</span>
+              <span class="chip">TypeScript</span>
+              <span class="chip">Sass</span>
+            </div>
+          </div>
+
+          <div class="skill-group reveal">
+            <h3 class="skill-group__title">Frameworklar & kutubxonalar</h3>
+            <div class="chips">
+              <span class="chip">Vue.js</span>
+              <span class="chip">React</span>
+              <span class="chip">Angular</span>
+              <span class="chip">Redux</span>
+              <span class="chip">Three.js</span>
+              <span class="chip">Tailwind CSS</span>
+              <span class="chip">Bootstrap</span>
+              <span class="chip">jQuery</span>
+            </div>
+          </div>
+
+          <div class="skill-group reveal">
+            <h3 class="skill-group__title">Backend & vositalar</h3>
+            <div class="chips">
+              <span class="chip">Node.js</span>
+              <span class="chip">Firebase</span>
+              <span class="chip">npm</span>
+              <span class="chip">Git</span>
+              <span class="chip">VS Code</span>
+              <span class="chip">WebStorm</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects -->
+    <section class="section" id="projects">
+      <div class="container">
+        <div class="section__head reveal">
+          <span class="section__tag">03 — Loyihalar</span>
+          <h2 class="section__title">Tanlangan <span class="grad-text">ishlarim</span></h2>
+          <p class="section__sub">Mana men ustida ishlagan ba'zi loyihalar.</p>
+        </div>
+
+        <div class="projects">
+          <article class="project reveal">
+            <div class="project__thumb project__thumb--1">
+              <span>VUE</span>
+            </div>
+            <div class="project__body">
+              <h3 class="project__title">Portfolio Website</h3>
+              <p class="project__desc">
+                Shaxsiy portfolio — zamonaviy dizayn va silliq animatsiyalar bilan.
+              </p>
+              <div class="project__tags">
+                <span>Vue</span><span>Tailwind</span><span>Vercel</span>
+              </div>
+              <a href="https://jahonsher.vercel.app" target="_blank" rel="noopener" class="project__link">
+                Saytni ochish →
+              </a>
+            </div>
+          </article>
+
+          <article class="project reveal">
+            <div class="project__thumb project__thumb--2">
+              <span>3D</span>
+            </div>
+            <div class="project__body">
+              <h3 class="project__title">3D Web tajriba</h3>
+              <p class="project__desc">
+                Three.js yordamida interaktiv 3D vizualizatsiya va animatsiyalar.
+              </p>
+              <div class="project__tags">
+                <span>Three.js</span><span>JavaScript</span><span>WebGL</span>
+              </div>
+              <a href="https://github.com/jahonsher" target="_blank" rel="noopener" class="project__link">
+                Batafsil →
+              </a>
+            </div>
+          </article>
+
+          <article class="project reveal">
+            <div class="project__thumb project__thumb--3">
+              <span>APP</span>
+            </div>
+            <div class="project__body">
+              <h3 class="project__title">React ilova</h3>
+              <p class="project__desc">
+                Firebase backend bilan to'liq funksional, responsive web ilova.
+              </p>
+              <div class="project__tags">
+                <span>React</span><span>Firebase</span><span>Redux</span>
+              </div>
+              <a href="https://github.com/jahonsher" target="_blank" rel="noopener" class="project__link">
+                Batafsil →
+              </a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="section section--alt" id="contact">
+      <div class="container">
+        <div class="cta reveal">
+          <div class="cta__content">
+            <span class="section__tag">04 — Aloqa</span>
+            <h2 class="cta__title">Keling, birga <span class="grad-text">ishlaymiz</span></h2>
+            <p class="cta__sub">
+              Loyihangiz bormi yoki shunchaki salomlashmoqchimisiz? Men bilan
+              istalgan vaqtda bog'lanishingiz mumkin.
+            </p>
+
+            <div class="cta__actions">
+              <a href="mailto:jahonsherraxmatov@gmail.com" class="btn btn--primary">
+                ✉️ Email yuborish
+              </a>
+              <a href="https://t.me/jahonsher" target="_blank" rel="noopener" class="btn btn--ghost">
+                Telegram'da yozish
+              </a>
+            </div>
+
+            <div class="socials">
+              <a href="https://t.me/jahonsher" target="_blank" rel="noopener" class="social" aria-label="Telegram">Telegram</a>
+              <a href="https://www.instagram.com/jahonsher.03/" target="_blank" rel="noopener" class="social" aria-label="Instagram">Instagram</a>
+              <a href="https://github.com/jahonsher" target="_blank" rel="noopener" class="social" aria-label="GitHub">GitHub</a>
+              <a href="mailto:jahonsherraxmatov@gmail.com" class="social" aria-label="Email">Email</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p>© <span id="year">2026</span> Jahonsher Raxmatov. Barcha huquqlar himoyalangan.</p>
+      <p class="footer__made">❤️ bilan yaratilgan</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
