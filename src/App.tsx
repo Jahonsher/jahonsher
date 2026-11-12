@@ -1,14 +1,78 @@
-function App() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-slate-950 px-6 text-center text-white">
-      <h1 className="bg-gradient-to-r from-pink-500 via-amber-400 to-cyan-400 bg-clip-text text-6xl font-extrabold tracking-tight text-transparent">
-        NovaColor
-      </h1>
-      <p className="max-w-md text-lg text-slate-300">
-        Loyiha tayyor: React + TypeScript + Vite + Tailwind CSS.
-      </p>
-    </main>
-  )
+import { useEffect, useRef } from 'react'
+import { Route, Routes, useLocation } from 'react-router'
+import { mediaGL } from './gl/media'
+import { Header } from './components/Header'
+import { Footer } from './components/Footer'
+import { Preloader } from './components/Preloader'
+import { Cursor } from './components/Cursor'
+import { TransitionProvider } from './components/Transition'
+import { useLang } from './i18n'
+import { initSmoothScroll, destroySmoothScroll, reducedMotion } from './lib/motion'
+import Home from './pages/Home'
+import Products from './pages/Products'
+import Product from './pages/Product'
+import About from './pages/About'
+import News from './pages/News'
+import Contact from './pages/Contact'
+import NotFound from './pages/NotFound'
+
+// initialise the shared WebGL layer before any page mounts its images
+const glCanvas = typeof document !== 'undefined' ? document.createElement('canvas') : null
+if (glCanvas && !reducedMotion) {
+  glCanvas.className = 'pointer-events-none fixed inset-0 z-0 h-full w-full'
+  glCanvas.setAttribute('aria-hidden', 'true')
+  mediaGL.init(glCanvas)
 }
 
-export default App
+function GLLayer() {
+  const host = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (glCanvas && host.current) host.current.appendChild(glCanvas)
+  }, [])
+  return <div ref={host} />
+}
+
+const titles: Record<string, { uz: string; ru: string }> = {
+  '/products': { uz: 'Mahsulotlar', ru: 'Продукты' },
+  '/about': { uz: 'Biz haqimizda', ru: 'О нас' },
+  '/news': { uz: 'Yangiliklar', ru: 'Новости' },
+  '/contact': { uz: 'Aloqa', ru: 'Контакты' },
+}
+
+export default function App() {
+  const { lang } = useLang()
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    initSmoothScroll()
+    return () => destroySmoothScroll()
+  }, [])
+
+  useEffect(() => {
+    document.documentElement.lang = lang
+    const key = Object.keys(titles).find((k) => pathname.startsWith(k))
+    document.title = key ? `${titles[key][lang]} — Novacolor` : 'Novacolor — I colori dell’Architettura'
+  }, [pathname, lang])
+
+  return (
+    <TransitionProvider>
+      <GLLayer />
+      <Header />
+      {/* page content stays transparent so the WebGL images (z-0) show through */}
+      <main key={lang} className="relative z-[1]">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/:slug" element={<Product />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Footer />
+      </main>
+      <Cursor />
+      <Preloader />
+    </TransitionProvider>
+  )
+}
